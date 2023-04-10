@@ -30,7 +30,6 @@ pip-delete-this-directory.txt
 # Virtual environments
 venv/
 ENV/
-env/
 
 # IDE-specific
 .vscode/
@@ -40,3 +39,6 @@ env/
 *.env
 *.pyc
 *.DS_Store
+
+# ignore the notebooks/ directory
+notebooks/
