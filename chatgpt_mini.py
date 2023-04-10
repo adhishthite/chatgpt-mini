@@ -7,30 +7,31 @@ import os
 
 import openai
 from rich.console import Console
+from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.rule import Rule
 from rich.table import Table
-from rich.panel import Panel
 
 # Constants
 # Set your API key and price mapping for different models
 try:
     API_KEY: str = os.environ["OPENAI_API_KEY"]
 except KeyError:
-    print("\n\nPlease set the OPENAI_API_KEY environment variable.\n\n")
-    API_KEY = input("\nEnter the OPENAI_API_KEY Key:\t")
+    print("\n\nPlease set the OPENAI_API_KEY environment variable.\n")
+    API_KEY = input("\nEnter the OPENAI_API_KEY Key: ")
     os.environ["OPENAI_API_KEY"] = API_KEY
-    
+
     if not API_KEY:
         exit(1)
 
 PRICE_MAP: dict = {
     "gpt-3.5-turbo": 0.002,
-    "gpt-4": 0.03,
+    "gpt-4"        : 0.03,
 }
 
 # Set the API key for the OpenAI library
 openai.api_key = API_KEY
+
 
 # ChatGPT class definition
 class ChatGPT:
@@ -57,7 +58,7 @@ class ChatGPT:
 
         self.conversation.append(
             {
-                'role': response.choices[0].message.role,
+                'role'   : response.choices[0].message.role,
                 'content': response.choices[0].message.content,
             }
         )
@@ -69,29 +70,32 @@ class ChatGPT:
         price_per_1000 = PRICE_MAP[self.model_id]
         price = (total_tokens / 1000) * price_per_1000
         self.cost += price
-        
+
         return round(price, 4)
 
     # Method to get the last message in the conversation
     def get_last_message(self) -> str:
         last_message = self.conversation[-1]
-        
+
         return f"[blue][i]{last_message['role'].strip().capitalize()}[/i][/]:\n{last_message['content'].strip()}\n\n"
+
 
 # Function to initialize the console with a header and return the console object
 def initialize_console() -> Console:
     console = Console()
     console.clear()
     console.print(Rule("[red][b]ChatGPT Mini[/b][/]\n"))
-    
+
     return console
 
+
 # Function to get the model ID from the user
-def get_model_id(console: Console) -> str:
+def get_model_id() -> str:
     return Prompt.ask("\nModel to use?:\t", choices=["gpt-4", "gpt-3.5-turbo"], default="gpt-3.5-turbo")
 
+
 # Function to get the context from the user
-def get_context(console: Console) -> str:
+def get_context() -> str:
     # This function prompts the user for a context for the chatbot
     # The default context is "General Purpose AI Chatbot"
     return Prompt.ask("\nContext for the chatbot?:\t", default="General Purpose AI Chatbot")
@@ -99,8 +103,8 @@ def get_context(console: Console) -> str:
 
 # Main
 console = initialize_console()
-model_id = get_model_id(console)
-context = get_context(console)
+model_id = get_model_id()
+context = get_context()
 
 # Instantiate the ChatGPT class with the selected model_id and context
 chat_gpt = ChatGPT(model_id, context)
@@ -122,11 +126,11 @@ console.rule(f"[yellow]{model_id}[/]")
 while True:
     # Get user input
     prompt = console.input('\n[green][i]You:[/i][/]\n')
-    
+
     # If the input is 'exit', break the loop and end the chat
     if prompt == "exit":
         break
-    
+
     # If the input is 'clear', reset the conversation and display a new initial message
     elif prompt == "clear":
         chat_gpt.conversation = []
@@ -136,7 +140,7 @@ while True:
 
         console.print(f"\n{chat_gpt.get_last_message()}")
         console.rule(f"[yellow]{model_id}[/]")
-    
+
     # For any other input, add the user message and get a response from ChatGPT
     else:
         chat_gpt.add_user_message(prompt)
