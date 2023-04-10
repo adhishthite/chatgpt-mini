@@ -3,6 +3,8 @@
 """
 
 # Import necessary libraries
+import os
+
 import openai
 from rich.console import Console
 from rich.prompt import Prompt
@@ -12,7 +14,16 @@ from rich.panel import Panel
 
 # Constants
 # Set your API key and price mapping for different models
-API_KEY: str = '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'
+try:
+    API_KEY: str = os.environ["OPENAI_API_KEY"]
+except KeyError:
+    print("\n\nPlease set the OPENAI_API_KEY environment variable.\n\n")
+    API_KEY = input("\nEnter the OPENAI_API_KEY Key:\t")
+    os.environ["OPENAI_API_KEY"] = API_KEY
+    
+    if not API_KEY:
+        exit(1)
+
 PRICE_MAP: dict = {
     "gpt-3.5-turbo": 0.002,
     "gpt-4": 0.03,
@@ -81,7 +92,10 @@ def get_model_id(console: Console) -> str:
 
 # Function to get the context from the user
 def get_context(console: Console) -> str:
+    # This function prompts the user for a context for the chatbot
+    # The default context is "General Purpose AI Chatbot"
     return Prompt.ask("\nContext for the chatbot?:\t", default="General Purpose AI Chatbot")
+
 
 # Main
 console = initialize_console()
@@ -92,14 +106,14 @@ context = get_context(console)
 chat_gpt = ChatGPT(model_id, context)
 
 # Add a system message to the conversation to set the context and desired response style
-chat_gpt.add_system_message(f"{context}. Respond very precisely. Do not give more information than necessary.")
+chat_gpt.add_system_message(f"{context}. Respond precisely. Do not give more information than necessary.")
 
 # Initialize the conversation with the GPT model and calculate the cost of initial tokens
 init_tokens = chat_gpt.gpt_conversation()
 chat_gpt.calculate_price_from_tokens(init_tokens)
 
 # Print the initial message from ChatGPT
-console.print(chat_gpt.get_last_message())
+console.print(f"\n{chat_gpt.get_last_message()}")
 
 # Print a separator rule displaying the chosen model_id
 console.rule(f"[yellow]{model_id}[/]")
@@ -116,11 +130,11 @@ while True:
     # If the input is 'clear', reset the conversation and display a new initial message
     elif prompt == "clear":
         chat_gpt.conversation = []
-        chat_gpt.add_system_message(f"{context}. Respond very precisely. Do not give more information than necessary.")
+        chat_gpt.add_system_message(f"{context}. Respond precisely. Do not give more information than necessary.")
         init_tokens = chat_gpt.gpt_conversation()
         chat_gpt.calculate_price_from_tokens(init_tokens)
 
-        console.print(chat_gpt.get_last_message())
+        console.print(f"\n{chat_gpt.get_last_message()}")
         console.rule(f"[yellow]{model_id}[/]")
     
     # For any other input, add the user message and get a response from ChatGPT
@@ -133,7 +147,7 @@ while True:
         total_cost = round(chat_gpt.cost, 4)
 
         # Print the response and a separator rule with token and cost information
-        console.print(chat_gpt.get_last_message())
+        console.print(f"\n{chat_gpt.get_last_message()}")
         meta = f"Total tokens: [red]{total_tokens}[/] | Cost: [red]${price}[/] | Total Cost: [red]${total_cost}[/]"
         console.rule(meta)
 
