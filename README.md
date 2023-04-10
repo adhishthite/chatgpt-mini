@@ -55,6 +55,16 @@ press Enter.
 
 At the end of the chat, the total cost of the conversation will be displayed in a table.
 
+## Screenshots
+
+![](docs/images/step2.png)
+
+![](docs/images/step3.png)
+
+![](docs/images/step4.png)
+
+![](docs/images/step5.png)
+
 ## License
 
 (c) 2023 by Adhish Thite. All rights reserved.
