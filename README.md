@@ -72,6 +72,6 @@ At the end of the chat, the total cost of the conversation will be displayed in 
 
 ## License
 
-(c) 2023 by Adhish Thite. All rights reserved.
+&copy; 2023 by Adhish Thite. All rights reserved.
 
 Made with ❤️ in India.

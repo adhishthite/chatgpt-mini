@@ -6,6 +6,7 @@
 import os
 
 import openai
+from openai.error import AuthenticationError, InvalidRequestError, RateLimitError
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
@@ -13,6 +14,11 @@ from rich.rule import Rule
 from rich.table import Table
 
 # Constants
+PRICE_MAP: dict = {
+    "gpt-3.5-turbo": 0.002,
+    "gpt-4"        : 0.06,
+}
+
 # Set your API key and price mapping for different models
 try:
     API_KEY: str = os.environ["OPENAI_API_KEY"]
@@ -24,13 +30,15 @@ except KeyError:
     if not API_KEY:
         exit(1)
 
-PRICE_MAP: dict = {
-    "gpt-3.5-turbo": 0.002,
-    "gpt-4"        : 0.03,
-}
-
 # Set the API key for the OpenAI library
 openai.api_key = API_KEY
+
+# Check if the API key is valid
+try:
+    openai.Model.list()
+except AuthenticationError:
+    print("\n\nInvalid API Key. Please set the OPENAI_API_KEY environment variable.\n")
+    exit(1)
 
 
 # ChatGPT class definition
@@ -51,19 +59,34 @@ class ChatGPT:
 
     # Method to interact with the GPT model and add the response to the conversation
     def gpt_conversation(self) -> int:
-        response = openai.ChatCompletion.create(
-            model=self.model_id,
-            messages=self.conversation
-        )
 
-        self.conversation.append(
-            {
-                'role'   : response.choices[0].message.role,
-                'content': response.choices[0].message.content,
-            }
-        )
+        try:
+            response = openai.ChatCompletion.create(
+                model=self.model_id,
+                messages=self.conversation
+            )
 
-        return response.usage.total_tokens
+            self.conversation.append(
+                {
+                    'role'   : response.choices[0].message.role,
+                    'content': response.choices[0].message.content,
+                }
+            )
+
+            return response.usage.total_tokens
+
+        except InvalidRequestError as exc:
+            console.print("\n\nSeems like there is an error in the request. Do you have access to GPT-3.5 and"
+                          " GPT-4?\n")
+            console.print(f"This is OpenAI's traceback: [red][b]{exc}[/b][/]\n")
+            exit(1)
+        except RateLimitError as exc:
+            console.print("\n\nSeems like you have exceeded the rate limit for the API. "
+                          "Please wait a while before trying again.\n")
+            console.print("If you see this error frequently, please view your billing, usage and quotas"
+                          "on the OpenAI platform.\n")
+            console.print(f"This is OpenAI's traceback: [red][b]{exc}[/b][/]\n")
+            exit(1)
 
     # Method to calculate the price based on tokens used
     def calculate_price_from_tokens(self, total_tokens: int) -> float:
