@@ -1,13 +1,12 @@
 # ChatGPT Mini
 
-This is a simple command-line chatbot application that utilizes OpenAI's GPT language model to generate conversational
-responses.
+<img src="docs/images/logo.png" alt="Your Project Logo" width="200" height="150">
 
-ChatGPT Mini is better for developers, researchers and students who want to experiment with OpenAI's GPT language model.
-For normal use, ChatGPT Mini is significantly better than the original ChatGPT for 2 main reasons:
+🚀 Introducing ChatGPT Mini: A sleek command line interface for ChatGPT!
 
-- **Pay per use** : ChatGPT Mini offers pay per use access to GPT-3.5 and GPT-4, instead of ChatGPT's $20 a month price tag
-- **Privacy** : ChatGPT Mini does not collect any user data, unlike ChatGPT's web app. 
+🤑 Save money with a cost-effective alternative to ChatGPT Plus!
+
+🔒 Enjoy complete privacy for your conversations!
 
 ## Getting Started
 
