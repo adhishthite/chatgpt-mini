@@ -12,6 +12,7 @@ from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.rule import Rule
 from rich.table import Table
+from rich.progress import Progress
 
 # Constants
 PRICE_MAP: dict = {
@@ -59,34 +60,42 @@ class ChatGPT:
 
     # Method to interact with the GPT model and add the response to the conversation
     def gpt_conversation(self) -> int:
+        with Progress() as progress:
+            task = progress.add_task("[cyan]Waiting for the API response...", total=100)
 
-        try:
-            response = openai.ChatCompletion.create(
-                model=self.model_id,
-                messages=self.conversation
-            )
+            try:
+                progress.update(task, completed=30)
 
-            self.conversation.append(
-                {
-                    'role'   : response.choices[0].message.role,
-                    'content': response.choices[0].message.content,
-                }
-            )
+                response = openai.ChatCompletion.create(
+                    model=self.model_id,
+                    messages=self.conversation
+                )
 
-            return response.usage.total_tokens
+                progress.update(task, completed=80)
+                self.conversation.append(
+                    {
+                        'role'   : response.choices[0].message.role,
+                        'content': response.choices[0].message.content,
+                    }
+                )
 
-        except InvalidRequestError as exc:
-            console.print("\n\nSeems like there is an error in the request. Do you have access to GPT-3.5 and"
-                          " GPT-4?\n")
-            console.print(f"This is OpenAI's traceback: [red][b]{exc}[/b][/]\n")
-            exit(1)
-        except RateLimitError as exc:
-            console.print("\n\nSeems like you have exceeded the rate limit for the API. "
-                          "Please wait a while before trying again.\n")
-            console.print("If you see this error frequently, please view your billing, usage and quotas"
-                          "on the OpenAI platform.\n")
-            console.print(f"This is OpenAI's traceback: [red][b]{exc}[/b][/]\n")
-            exit(1)
+                # Update the progress bar to 100% when the response is received
+                progress.update(task, completed=100)
+
+                return response.usage.total_tokens
+
+            except InvalidRequestError as exc:
+                console.print("\n\nSeems like there is an error in the request. Do you have access to GPT-3.5 and"
+                              " GPT-4?\n")
+                console.print(f"This is OpenAI's traceback: [red][b]{exc}[/b][/]\n")
+                exit(1)
+            except RateLimitError as exc:
+                console.print("\n\nSeems like you have exceeded the rate limit for the API. "
+                              "Please wait a while before trying again.\n")
+                console.print("If you see this error frequently, please view your billing, usage and quotas"
+                              "on the OpenAI platform.\n")
+                console.print(f"This is OpenAI's traceback: [red][b]{exc}[/b][/]\n")
+                exit(1)
 
     # Method to calculate the price based on tokens used
     def calculate_price_from_tokens(self, total_tokens: int) -> float:
@@ -145,10 +154,24 @@ console.print(f"\n{chat_gpt.get_last_message()}")
 # Print a separator rule displaying the chosen model_id
 console.rule(f"[yellow]{model_id}[/]")
 
+input_prompt = '\n[green][i]You:[/i][/]\n'
+
 # Main loop to interact with the chatbot
 while True:
     # Get user input
-    prompt = console.input('\n[green][i]You:[/i][/]\n')
+    user_input_lines = []
+    while True:
+        line = console.input(input_prompt)
+        if line == "SUBQ":
+            break
+
+        user_input_lines.append(line)
+        input_prompt = ''  # Remove the "You:" prompt for subsequent lines
+
+    prompt = "\n".join(user_input_lines)
+
+    # Reset the input prompt for the next message
+    input_prompt = '\n[green][i]You:[/i][/]\n'
 
     # If the input is 'exit', break the loop and end the chat
     if prompt == "exit":
