@@ -74,4 +74,4 @@ At the end of the chat, the total cost of the conversation will be displayed in 
 
 &copy; 2023 by Adhish Thite. All rights reserved.
 
-Made with ❤️ in India.
+Made with ❤️ in भारत 🇮🇳
