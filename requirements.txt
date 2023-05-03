@@ -2,3 +2,4 @@ openai
 rich
 cchardet
 keyboard
+Flask

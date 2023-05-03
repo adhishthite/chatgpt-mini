@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Setup</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>ChatGPT Mini Setup</h1>
+        <form id="setup_form">
+            <div class="form-group row">
+                <label for="api_key" class="col-md-4 col-form-label">API Key:</label>
+                <div class="col-md-8">
+                    <input type="text" class="form-control" id="api_key" name="api_key" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="model_id" class="col-md-4 col-form-label">Model ID:</label>
+                <div class="col-md-8">
+                    <select class="form-control" id="model_id" name="model_id" required>
+                        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                        <option value="gpt-4">gpt-4</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="context" class="col-md-4 col-form-label">Context:</label>
+                <div class="col-md-8">
+                    <input type="text" class="form-control" id="context" name="context" value="General Purpose AI Chatbot" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save Configuration</button>
+            </div>
+        </form>
+        <div class="message" id="message"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <script src="/static/scripts.js"></script>
+
+    <div class="footer">
+        <footer>&copy; 2023, Adhish Thite. Made with ❤️ in भारत 🇮🇳</footer>
+    </div>
+</body>
+</html>
